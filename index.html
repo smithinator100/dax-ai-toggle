@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dax AI Toggle</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+</head>
+<body>
+    <select id="top-corner-select" class="top-corner-dropdown">
+        <option value="lottie/toggle-v1/toggle-v1.json">Original</option>
+        <option value="lottie/toggle-v2/toggle-v2.json" selected>Toggle Anim</option>
+        <option value="lottie/toggle-v3/toggle-v3.json">Toggle Looped</option>
+    </select>
+    
+    <div class="container">
+        <div id="lottie-container"></div>
+        <div id="lottie-toggle-container"></div>
+        <div class="tabs">
+            <img id="search-img" src="img/search-inactive.png" alt="Search Inactive">
+            <img id="duckai-img" src="img/duckai-active.png" alt="DuckAI Active">
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
