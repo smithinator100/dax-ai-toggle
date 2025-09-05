@@ -17,20 +17,55 @@ document.addEventListener('DOMContentLoaded', function() {
         renderer: 'svg',
         loop: false,
         autoplay: false,
-        path: 'lottie/toggle-v2/toggle-v2.json'
+        path: 'lottie/toggle-v4/toggle-v4.json'
     });
     
-    // Play frames 1-30 on intro then stop (initial load is now toggle-v2)
+    // Set initial state for toggle-v4
+    let isToggleV4Active = true;
+    
+    // Play frames 1-30 on intro then loop the rest (initial load is now toggle-v4)
+    let hasIntroPlayed = false;
+    
     toggleAnimation.addEventListener('DOMLoaded', function() {
-        toggleAnimation.playSegments([1, 30], true);
+        console.log('Playing intro [1, 30] for toggle-v4, then looping rest');
+        
+        // Play intro without forcing complete
+        toggleAnimation.playSegments([1, 30], false);
+        
+        // Listen for when animation reaches frame 30
+        toggleAnimation.addEventListener('enterFrame', function checkFrame() {
+            const currentFrame = Math.floor(toggleAnimation.currentFrame);
+            
+            if (currentFrame >= 30 && !hasIntroPlayed) {
+                console.log('Reached frame 30, starting continuous loop');
+                hasIntroPlayed = true;
+                
+                // Remove this listener
+                toggleAnimation.removeEventListener('enterFrame', checkFrame);
+                
+                // Get total frames
+                const totalFrames = toggleAnimation.totalFrames;
+                console.log('Total frames:', totalFrames, 'Setting up loop from frame 30');
+                
+                // Set up loop for frames 30 onwards and play continuously
+                toggleAnimation.playSegments([30, totalFrames - 1], true);
+                
+                // Add complete listener to restart from frame 30 when it finishes
+                toggleAnimation.addEventListener('complete', function restartLoop() {
+                    console.log('Loop complete, restarting from frame 30');
+                    toggleAnimation.goToAndPlay(30, false);
+                });
+            }
+        });
     });
     
     // Function to load new animation based on dropdown selection
     function loadNewAnimation(animationPath) {
         console.log('Loading animation:', animationPath);
         
-        // Check if this is toggle-v3
+        // Check if this is toggle-v3 or toggle-v4
         isToggleV3Active = animationPath.includes('toggle-v3');
+        isToggleV4Active = animationPath.includes('toggle-v4');
         
         // Destroy current toggle animation
         if (toggleAnimation) {
@@ -65,9 +100,43 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleAnimation.addEventListener('DOMLoaded', function() {
             console.log('Animation DOM loaded:', animationPath);
             // Handle initial playback for toggle animations
-            if (animationPath.includes('toggle') && !isToggleV3Active) {
+            if (animationPath.includes('toggle') && !isToggleV3Active && !isToggleV4Active) {
                 console.log('Playing segments [1, 30] for toggle animation');
                 toggleAnimation.playSegments([1, 30], true);
+            }
+            // For toggle-v4, play intro then loop the rest
+            else if (isToggleV4Active) {
+                console.log('Playing intro [1, 30] for toggle-v4, then looping rest');
+                let hasNewIntroPlayed = false;
+                
+                // Play intro without forcing complete
+                toggleAnimation.playSegments([1, 30], false);
+                
+                // Listen for when animation reaches frame 30
+                toggleAnimation.addEventListener('enterFrame', function checkFrame() {
+                    const currentFrame = Math.floor(toggleAnimation.currentFrame);
+                    
+                    if (currentFrame >= 30 && !hasNewIntroPlayed) {
+                        console.log('Reached frame 30, starting continuous loop');
+                        hasNewIntroPlayed = true;
+                        
+                        // Remove this listener
+                        toggleAnimation.removeEventListener('enterFrame', checkFrame);
+                        
+                        // Get total frames
+                        const totalFrames = toggleAnimation.totalFrames;
+                        console.log('Total frames:', totalFrames, 'Setting up loop from frame 30');
+                        
+                        // Set up loop for frames 30 onwards and play continuously
+                        toggleAnimation.playSegments([30, totalFrames - 1], true);
+                        
+                        // Add complete listener to restart from frame 30 when it finishes
+                        toggleAnimation.addEventListener('complete', function restartLoop() {
+                            console.log('Loop complete, restarting from frame 30');
+                            toggleAnimation.goToAndPlay(30, false);
+                        });
+                    }
+                });
             }
             // For toggle-v3, animation will autoplay and loop automatically
         });
@@ -112,8 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add click event listeners
     searchImg.addEventListener('click', function() {
         if (!isSearchActive) {
-            // Only play animation segments if not toggle-v3
-            if (!isToggleV3Active) {
+            // Only play animation segments if not toggle-v3 or toggle-v4
+            if (!isToggleV3Active && !isToggleV4Active) {
                 // Search was inactive, now switching to search active - play frames 30-60
                 toggleAnimation.playSegments([30, 60], true);
             }
@@ -123,8 +192,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     duckaiImg.addEventListener('click', function() {
         if (isSearchActive) {
-            // Only play animation segments if not toggle-v3
-            if (!isToggleV3Active) {
+            // Only play animation segments if not toggle-v3 or toggle-v4
+            if (!isToggleV3Active && !isToggleV4Active) {
                 // DuckAI was inactive, now switching to duckai active - play frames 0-30
                 toggleAnimation.playSegments([0, 30], true);
             }
@@ -132,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Initialize cursor styles based on default selection (toggle-v2)
+    // Initialize cursor styles based on default selection (toggle-v4)
     searchImg.style.cursor = 'pointer';
     duckaiImg.style.cursor = 'pointer';
 });
